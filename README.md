@@ -161,6 +161,59 @@
     - 401 Unauthorized: Missing or invalid access token.
     - 404 Not Found: Short URL does not exist or has no analytics data.
 
+
+
+### To run the app without docker
+ 
+### To run frontend app
+- Navigate into frontend folder and then,
+- first install dependencies with the following command
+```bash
+    npm install
+```
+
+- and then run the following command to run the server:
+```bash
+    npm run dev
+```
+
+### To run backend app
+- Navigate into backend folder and then,
+- create virtual enviropnemnt first by running the following command
+```bash
+    python3 -m venv env
+```
+- activate virtual enviropnemnt by running the following command if you are using unix system
+```bash
+    source env/bin/activate 
+```
+- activate virtual enviropnemnt by running the following command if you are using windows system
+```bash
+    source env/Scripts/activate 
+```
+-  install dependencies with the following command
+```bash
+    pip install -r requirements.txt
+```
+-  install dependencies with the following command
+```bash
+    pip install -r requirements.txt
+```
+- to run db migrations:
+```bash
+    pyhton manage.py makemigrations
+```
+
+- to migrate db migrations
+```bash
+    pyhton manage.py migrate
+```
+
+- to run server, use the following command
+```bash
+    pyhton manage.py runserver
+```
+
 ### Dockerize
 - After cloning the repository, open backend folder, navigate into urlshortener, under settings.py
 and change the host of database from localhost to db as shown in the image below:
@@ -169,6 +222,5 @@ and change the host of database from localhost to db as shown in the image below
 - Run the docker, by typing
  ```bash
     docker compose up --build
- ```
- 
+ ``` 
 Note: I was unable to dockerize the frontend app because of time
