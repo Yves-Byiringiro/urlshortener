@@ -32,18 +32,23 @@ export const authSlice = createSlice({
           state.loginSuccess = false;
           state.logoutError = null;
           state.user = {};
+          state.isAuthenticated = false;
         });
         builder.addCase(login.fulfilled, (state, action) => {
           state.loginLoading = false;
           state.loginSuccess = true;
           state.logoutError = null;
           state.user = action.payload;
+          state.isAuthenticated = true;
+
         });
         builder.addCase(login.rejected, (state, action) => {
             state.loginLoading = false;
             state.loginSuccess = false;
             state.logoutError = action.payload;
             state.user = {};
+            state.isAuthenticated = false;
+
         })
 
         // register
@@ -67,17 +72,17 @@ export const authSlice = createSlice({
         })
 
         // logout
-        builder.addCase(login.pending, (state) => {
+        builder.addCase(logout.pending, (state) => {
             state.logoutLoading = true;
             state.logoutSuccess = false;
             state.logoutError = null;
         });
-        builder.addCase(login.fulfilled, (state) => {
+        builder.addCase(logout.fulfilled, (state) => {
             state.logoutLoading = false;
             state.logoutSuccess = true;
             state.logoutError = null;
         });
-        builder.addCase(login.rejected, (state, action) => {
+        builder.addCase(logout.rejected, (state, action) => {
             state.logoutLoading = false;
             state.logoutSuccess = false;
             state.logoutError = action.payload;
@@ -93,6 +98,10 @@ export const register = createAsyncThunk("auth/register", async ({ email, userna
   return await apiRequest('auth/register', 'POST', { email, username, password }, thunkAPI)
 })
 
+
+export const logout = createAsyncThunk("auth/logout", async ({ refreshToken }, thunkAPI) => {
+    return await apiRequest('auth/login', 'POST', { refreshToken }, thunkAPI);
+  });
 
 
 export const { } = authSlice.actions;

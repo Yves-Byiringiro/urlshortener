@@ -3,6 +3,8 @@ import Home from "./screens/home";
 import Dashboard from "./screens/dashboard";
 import Links from "./screens/links";
 import Analytics from "./screens/analytics";
+import Login from "./screens/login";
+import Register from "./screens/register";
 
 function App() {
 

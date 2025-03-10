@@ -1,5 +1,5 @@
 import axios from 'axios';
-const baseURL = import.meta.env.BACKEND_API_ENDPOINT;
+const baseURL = 'http://localhost:8000';
 
 
 export const reqInstance = axios.create({
