@@ -68,3 +68,24 @@ class GetOriginalURL(APIView):
             return Response({"error": "URL not found"}, status=status.HTTP_404_NOT_FOUND)
         except:
             return Response({"error": 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+class ShortenURLAnalytics(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, shortUrl):
+        try:
+            parsed_url = urlparse(shortUrl)
+            short_code = parsed_url.path.strip('/') if parsed_url.netloc else shortUrl.strip('/')
+
+            if not short_code:
+                return Response({"error": "Invalid short URL"}, status=status.HTTP_400_BAD_REQUEST)
+
+            url_instance = URL.objects.get(short_code=short_code)
+
+            url_analytics = URLClickAnalytics.objects.filter(url=url_instance)
+            serialized_url_analytics = ShortenURLAnalyticsSerializer(url_analytics, many=True).data
+            return Response({"analytics": serialized_url_analytics}, status=status.HTTP_200_OK)
+        except URL.DoesNotExist:
+            return Response({"error": "URL provided not found"}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
