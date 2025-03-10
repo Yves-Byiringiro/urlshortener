@@ -110,6 +110,8 @@ if DEVELOPMENT_MODE is True:
         }
     }
 
+# Configure custom user model
+AUTH_USER_MODEL = 'authentication.User'
 
 # Configure bcrypt as hashing algorithm
 PASSWORD_HASHERS = [
