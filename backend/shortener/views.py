@@ -32,3 +32,12 @@ class ShortenURL(APIView):
         except:
             return Response({"error": 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+    def get(self, request):
+        try:
+            user = request.user
+            user_urls = URL.objects.filter(user_id=user)
+            serializer_urls = ShortenURLSerializer(user_urls, many=True).data
+            return Response({"urls": serializer_urls}, status=status.HTTP_200_OK)
+        except:
+            return Response({"error": 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
