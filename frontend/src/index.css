@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;700&family=Geist+Mono:wght@400;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -35,3 +36,11 @@ body {
   transition: all 0.5s ease-out;
 }
 
+
+body {
+  font-family: 'Geist', sans-serif;
+}
+
+code {
+  font-family: 'Geist Mono', monospace;
+}
