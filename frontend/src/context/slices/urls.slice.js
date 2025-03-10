@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { apiRequest } from "../api";
+import { reqInstance } from "../api";
 
 export const urlsSlice = createSlice({
     name: "urls",
@@ -14,8 +14,19 @@ export const urlsSlice = createSlice({
       urlsAnalyticsLoading: false,
       urlsAnalyticsError: null,
       urlsAnalyticsSuccess: false,
+
+      shortURL: "",
+      shortenUrlLoading: false,
+      shortenUrlError: null,
+      shortenUrlSuccess: false,
     },
     reducers: {
+        resetShortenUrlState: (state) => {
+            state.shortenUrlLoading = false;
+            state.shortenUrlError = null;
+            state.shortenUrlSuccess = false;
+            state.shortURL = "";
+        }
     }, 
     extraReducers: (builder) => {
         // user urls
@@ -29,7 +40,7 @@ export const urlsSlice = createSlice({
           state.userUrlsLoading = false;
           state.userUrlsSuccess = true;
           state.userUrlsError = null;
-          state.userUrls = action.payload;
+          state.userUrls = action.payload?.urls;
         });
         builder.addCase(getUserURLs.rejected, (state, action) => {
             state.userUrlsLoading = false;
@@ -57,19 +68,74 @@ export const urlsSlice = createSlice({
           state.urlsAnalyticsSuccess = false;
           state.urlsAnalytics = [];
         })
+
+
+        // shorten url
+        builder.addCase(shortenUrl.pending, (state) => {
+            state.shortenUrlLoading = true;
+            state.shortenUrlError = null;
+            state.shortenUrlSuccess = false;
+            state.shortURL = "";
+          });
+          builder.addCase(shortenUrl.fulfilled, (state, action) => {
+            state.shortenUrlLoading = false;
+            state.shortenUrlError = null;
+            state.shortenUrlSuccess = true;
+            state.shortURL = action.payload?.short_url;
+          });
+          builder.addCase(shortenUrl.rejected, (state, action) => {
+            state.shortenUrlLoading = false;
+            state.shortenUrlError = action.payload;
+            state.shortenUrlSuccess = false;
+            state.shortURL = "";
+          })
     }
 });
 
+
 export const getUserURLs = createAsyncThunk("user/urls", async (_, thunkAPI) => {
-    return await apiRequest(`urls`, "GET", {}, thunkAPI, true);
+      try {
+        const response = await reqInstance.get(`urls`, {
+          headers: {
+            'Authorization': `Bearer ${JSON.parse(localStorage.getItem('authTokens'))?.access}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        return response.data;
+      } catch (error) {
+        return thunkAPI.rejectWithValue(error.message);
+      }
+    }
+);
+
+export const getUserAnalyticsURLs = createAsyncThunk("user/analytics", async ({shortUrl}, thunkAPI) => {
+    try {
+      const response = await reqInstance.get(`analytics/${shortUrl}`, {
+        headers: {
+          'Authorization': `Bearer ${JSON.parse(localStorage.getItem('authTokens'))?.access}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.message);
+    }
+  }
+);
+
+export const shortenUrl = createAsyncThunk("user/shorten-url", async ({ long_url, title }, thunkAPI) => {
+    try {
+      const response = await reqInstance.post(`shorten`, {long_url, title}, {
+        headers: {
+          'Authorization': `Bearer ${JSON.parse(localStorage.getItem('authTokens'))?.access}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data.message);
+    }
 });
 
-export const getUserAnalyticsURLs = createAsyncThunk("user/analytics", async ({ shortUrl }, thunkAPI) => {
-    return await apiRequest(`analytics/${shortUrl}`, "GET", {}, thunkAPI, true);
-});
 
-
-
-
-export const { } = urlsSlice.actions;
-
+export const { resetShortenUrlState } = urlsSlice.actions;

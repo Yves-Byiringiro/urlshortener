@@ -1,29 +1,52 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from "react-redux";
 import { login } from "../context/slices/auth.slice";
-
 
 export default function Login() {
     const dispatch = useDispatch();
-    const { loginLoading, loginSuccess, loginError, isAuthenticated } = useSelector((state)=> state.auth);
-    
+    const { loginLoading, loginError, isAuthenticated } = useSelector((state) => state.auth);
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
     const navigate = useNavigate();
 
+    const validateEmail = (email) => {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
+    };
+
+    const validatePassword = (password) => {
+        return password.length >= 6;
+    };
+
     const handleLogin = async (e) => {
         e.preventDefault();
-        setError("");
-        dispatch(login({email, password})); 
+        setError(""); 
+        if (!validateEmail(email)) {
+            setError("Please enter a valid email address.");
+            return;
+        }
+        if (!validatePassword(password)) {
+            setError("Password must be at least 6 characters long.");
+            return;
+        }
+
+        dispatch(login({ email, password }));
     };
 
     useEffect(() => {
         if (isAuthenticated) {
-            navigate('/home');
+            navigate("/home");
         }
-    }, [isAuthenticated])
+    }, [isAuthenticated, navigate]);
+
+    useEffect(() => {
+        if (loginError) {
+            setError(loginError);
+        }
+    }, [loginError]);
 
     return (
         <div className="flex justify-center items-center min-h-screen bg-gray-100">
@@ -38,7 +61,7 @@ export default function Login() {
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
-                            className="w-full mt-1 p-2 border rounded-lg focus:ring focus:ring-blue-300"
+                            className="w-full mt-1 p-2 border rounded-lg focus:ring focus:ring-blue-300 text-gray-700"
                         />
                     </div>
                     <div>
@@ -48,16 +71,25 @@ export default function Login() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
-                            className="w-full mt-1 p-2 border rounded-lg focus:ring focus:ring-blue-300"
+                            className="w-full mt-1 p-2 border rounded-lg focus:ring focus:ring-blue-300 text-gray-700"
                         />
                     </div>
                     <button
                         type="submit"
                         className="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700 transition"
+                        disabled={loginLoading}
                     >
-                        Login
+                        {loginLoading ? "Logging in..." : "Login"}
                     </button>
                 </form>
+                <div className="mt-4 text-center">
+                    <p className="text-sm text-black">
+                        Don't have an account?{" "}
+                        <a href="/register" className="text-blue-600 hover:text-blue-800">
+                            Register here
+                        </a>
+                    </p>
+                </div>
             </div>
         </div>
     );

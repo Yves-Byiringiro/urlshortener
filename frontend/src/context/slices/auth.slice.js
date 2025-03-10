@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { apiRequest } from "../api";
+import { reqInstance } from "../api";
 
 export const authSlice = createSlice({
     name: "auth",
@@ -17,12 +18,14 @@ export const authSlice = createSlice({
       logoutSuccess: false,
     },
     reducers: {
-      logout: (state) => {
+        logoutState: (state) => {
         state.isAuthenticated = false;
-        state.user = null;
-        state.success = false;
-        state.error = null;
-        state.loading = false;
+        state.user = {};
+        state.loginSuccess = false;
+        state.loginError = null;
+        state.loginLoading = false;
+        localStorage.removeItem("authTokens");
+        return state;
       },
     }, 
     extraReducers: (builder) => {
@@ -38,14 +41,14 @@ export const authSlice = createSlice({
           state.loginLoading = false;
           state.loginSuccess = true;
           state.logoutError = null;
-          state.user = action.payload;
+          state.user = action.payload?.user;
           state.isAuthenticated = true;
 
         });
         builder.addCase(login.rejected, (state, action) => {
             state.loginLoading = false;
             state.loginSuccess = false;
-            state.logoutError = action.payload;
+            state.logoutError = action.payload?.error;
             state.user = {};
             state.isAuthenticated = false;
 
@@ -62,7 +65,7 @@ export const authSlice = createSlice({
           state.registerLoading = false;
           state.registerError = null;
           state.registerSuccess = true;
-          state.user = action.payload;
+          state.user = action.payload?.user;
         });
         builder.addCase(register.rejected, (state, action) => {
           state.registerLoading = false;
@@ -90,13 +93,45 @@ export const authSlice = createSlice({
     }
 });
 
-export const login = createAsyncThunk("auth/login", async ({ email, password }, thunkAPI) => {
-  return await apiRequest('auth/login', 'POST', { email, password }, thunkAPI);
+
+export const login = createAsyncThunk("auth/login", async ({ email, password  }, thunkAPI) => {
+    try {
+      const response = await reqInstance.post(`auth/login`, {email, password }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const auth = response.data;
+      console.log(auth)
+      const authTokens = {
+        access: auth?.tokens?.access,
+        refresh: auth?.tokens?.refresh
+      }
+      localStorage.setItem("authTokens", JSON.stringify(authTokens));
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data.error);
+    }
 });
 
-export const register = createAsyncThunk("auth/register", async ({ email, username, password }, thunkAPI) => {
-  return await apiRequest('auth/register', 'POST', { email, username, password }, thunkAPI)
-})
+export const register = createAsyncThunk("auth/register", async ({ email, username, password  }, thunkAPI) => {
+    try {
+      const response = await reqInstance.post(`auth/register`, { email, username, password }, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+      const auth = response.data;
+      const authTokens = {
+        access: auth?.tokens?.access,
+        refresh: auth?.tokens?.refresh
+      }
+      localStorage.setItem("authTokens", JSON.stringify(authTokens));
+      return response.data;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data.error);
+    }
+});
 
 
 export const logout = createAsyncThunk("auth/logout", async ({ refreshToken }, thunkAPI) => {
@@ -104,5 +139,11 @@ export const logout = createAsyncThunk("auth/logout", async ({ refreshToken }, t
   });
 
 
-export const { } = authSlice.actions;
+export const { logoutState } = authSlice.actions;
 
+
+
+
+
+
+     

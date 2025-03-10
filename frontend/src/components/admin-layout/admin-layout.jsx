@@ -2,10 +2,20 @@ import { useState } from "react";
 import { SideNavigation } from "./side-navigation";
 import { TopNavigation } from "./top-navigation";
 import classNames from "classnames";
+import { useSelector } from "react-redux";
+import { useLocation } from "react-router-dom";
+import { Navigate } from "react-router";
+
 
 export const AdminLayout = ({ children }) => {
   const [open, setOpen] = useState(false);
+  const {isAuthenticated }  = useSelector(state=>state.auth);
 
+  const location = useLocation();
+
+  if(!isAuthenticated){
+      return <Navigate to="/login" replace state={{from:location}} />
+  }
   return (
     <>
       <SideNavigation open={open} setOpen={setOpen} />
