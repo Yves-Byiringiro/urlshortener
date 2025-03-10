@@ -105,7 +105,7 @@ if DEVELOPMENT_MODE is True:
             'NAME': os.getenv("LOCAL_DB_NAME"),
             'USER': os.getenv("LOCAL_DB_USER"),           
             'PASSWORD': os.getenv("LOCAL_DB_PASSWORD"),   
-            'HOST': 'localhost',            
+            'HOST': 'localhost',    # replace 'localhost' to 'db' when running a project with docker        
             'PORT': '5432',                 
         }
     }

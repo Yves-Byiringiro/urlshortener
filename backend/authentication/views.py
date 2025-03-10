@@ -38,7 +38,11 @@ class Register(APIView):
                 }, status=status.HTTP_201_CREATED)      
             else:
                 return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
-        except:    
+        except Exception as e:
+            print("-------------------------------------------")
+            print(e)
+            print("-------------------------------------------")
+
             return Response({"error": "Internal server error"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class Login(APIView):

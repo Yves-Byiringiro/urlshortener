@@ -23,6 +23,7 @@ class RegisterSerializer(serializers.Serializer):
     def validate(self, data):
         if 'password' in data and len(data['password']) < 6:
             raise ValidationError("Password must be at least 6 characters long.")
+        return data
 
 class LoginSerializer(serializers.Serializer):
     email = serializers.CharField()
