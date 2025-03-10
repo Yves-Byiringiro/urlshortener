@@ -61,7 +61,8 @@ SIMPLE_JWT = {
 
 # Configure CORS
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
+    "http://localhost:5173",
+    "https://yb-url-shortner.vercel.app"
 ]
 
 MIDDLEWARE = [
