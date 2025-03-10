@@ -41,3 +41,12 @@ class LoginSerializer(serializers.Serializer):
             raise ValidationError("Invalid email or password.")
 
         return user
+
+class LogoutSerialiazer(serializers.Serializer):
+    refresh = serializers.CharField()
+    
+    def validate(self, data):
+        refresh = data.get('refresh')
+        if not refresh:
+            raise serializers.ValidationError("Refresh token is required")
+        return data

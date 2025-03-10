@@ -7,7 +7,8 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from .serializers import (
     UserInfoSerializer,
     RegisterSerializer,
-    LoginSerializer
+    LoginSerializer,
+    LogoutSerialiazer
     )
 from .utils import get_tokens_for_user
 from .models import User
@@ -60,3 +61,7 @@ class Login(APIView):
                 return Response({"error": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
             return Response({"error": 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class Logout(APIView):
+    permission_classes = (IsAuthenticated,)
