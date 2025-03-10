@@ -23,3 +23,21 @@ class RegisterSerializer(serializers.Serializer):
     def validate(self, data):
         if 'password' in data and len(data['password']) < 6:
             raise ValidationError("Password must be at least 6 characters long.")
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.CharField()
+    password = serializers.CharField()
+
+    def validate(self, data):
+        email = data.get('email')
+        password = data.get('password')
+
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            raise ValidationError("Invalid email or password.")
+
+        if not user.check_password(password):
+            raise ValidationError("Invalid email or password.")
+
+        return user
