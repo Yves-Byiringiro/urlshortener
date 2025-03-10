@@ -239,5 +239,3 @@ __pycache__/
 Pipfile
 
 Dockerfile
-
-migrations/
