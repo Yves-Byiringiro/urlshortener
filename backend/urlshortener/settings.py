@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     
     # Local apps
     'authentication',
-    'shortner'
+    'shortener'
 ]
 
 # Configure JWT
