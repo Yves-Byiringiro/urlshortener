@@ -5,7 +5,8 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import URL, URLClickAnalytics
 from .serializers import URLSerializer, ShortenURLSerializer, ShortenURLAnalyticsSerializer
-from .utils import is_valid_url, generate_short_code
+from .utils import is_valid_url, generate_short_code, get_device, get_location, get_ip_address
+
 
 class ShortenURL(APIView):
     permission_classes = (IsAuthenticated,)
@@ -41,3 +42,29 @@ class ShortenURL(APIView):
         except:
             return Response({"error": 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
+class GetOriginalURL(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    def get(self, request, short_code):
+        try:
+            url_instance = URL.objects.get(short_code=short_code)
+
+            device = get_device(request)
+            location = get_location(request)
+            ip_address = get_ip_address(request)
+
+            URLClickAnalytics.objects.create(
+                url=url_instance,
+                device=device,
+                country=location,
+                ip_address=ip_address
+            )
+
+            url_instance.clicks += 1
+            url_instance.save()
+
+            return Response({"long_url": url_instance.long_url}, status=status.HTTP_200_OK)
+        except URL.DoesNotExist:
+            return Response({"error": "URL not found"}, status=status.HTTP_404_NOT_FOUND)
+        except:
+            return Response({"error": 'Internal server error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
